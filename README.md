@@ -27,20 +27,20 @@ A ideia do projeto é desenvolver um sistema de gerenciamento de inventário em 
 ```
 /Projeto Sistema de inventario em Haskell
 ├── 
-└── README.md # Documentação do projeto
+└── README.md - Documentação do projeto
 ```
 
 ---
 
 ## Como Executar
 
-1. Acesse o **OnlineGDB** (https://www.onlinegdb.com/)
+1. Acesse o **OnlineGDB** (https://www.onlinegdb.com/).  
+2. No editor que abrir, apague o código padrão e **cole o código do Sistema de inventario em Haskell**  
+3. Em **Language**, localizada no **canto superior direito**, selecione a linguagem **Haskell**
+4. Clique no botão **Run** para compilar e iniciar o programa.
+5. Assim que o console abrir, você verá o menu principal do sistema.
 
----
-
-## Exemplo de Uso
-
----
+## Exemplos de teste
 
 **Resposta Esperada** 
 
@@ -49,7 +49,6 @@ A ideia do projeto é desenvolver um sistema de gerenciamento de inventário em 
 ## Possíveis Melhorias Futuras
 
 * 
-
 
 ---
 
