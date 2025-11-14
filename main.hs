@@ -101,22 +101,23 @@ type ResultadoOperacao = (Inventario, LogEntry)
 --   Inventario -> o estado atual do inventário
 -- Retorna: Either String ResultadoOperacao (erro ou sucesso)
 
-addItem :: UTCTime -> Item -> Inventario -> Either String ResultadoOperacao
+-- Valida se o ID já existe. Caso exista, retorna erro (Left).
+addItem :: UTCTime -> Item -> Inventario -> Either String ResultadoOperacao -- essa é a assinatura da função 
 addItem time item inv =
-    if Map.member (itemID item) inv
+    if Map.member (itemID item) inv -- Verifica se o itemID já existe no Map (inv é um Map String Item). Retorna True se o item já está cadastrado (executando o then) e False caso contrário (executando o else).
         then 
-            -- Caso o item já exista, cria uma entrada de log de falha.
-            let logFail = LogEntry time Add
+            let logFail = LogEntry time Add -- Cria uma entrada de log (logFail) com: time: momento atual; Add: tipo de ação; Uma mensagem de falha ("ID já existe") e um StatusLog de falha.
                         ("Falha ao adicionar: ID " ++ itemID item ++ " já existe.")
                         (Falha "ID duplicado")
-            in Left "ID duplicado"
-        else 
-            -- Caso contrário, insere o item e gera um log de sucesso.
+                in Left "ID duplicado" -- Retorna Left "ID duplicado" (ou seja, falha)
+
+
+        else -- Se o ID não existe, Usa Map.insert para inserir o novo item no inventário
             let novoInv = Map.insert (itemID item) item inv
-                logOk = LogEntry time Add
+                logOk = LogEntry time Add -- Cria um log de sucesso (logOk)
                     ("Item " ++ nome item ++ " adicionado com sucesso.")
                     Sucesso
-            in Right (novoInv, logOk)
+            in Right (novoInv, logOk) -- Retorna esse resultadode operação
             
             
             
@@ -127,23 +128,46 @@ addItem time item inv =
 -- Remove um item existente do inventário e retorna erro caso o ID não exista.
 -- Recebe: UTCTime, ID do item e o inventário atual.
 
-removeItem :: UTCTime -> String -> Inventario -> Either String ResultadoOperacao
-removeItem time idItem inv =
+removeItem :: UTCTime -> String -> Int -> Inventario -> Either String ResultadoOperacao
+removeItem time idItem qtdRemover inv =
     case Map.lookup idItem inv of
         Nothing ->
-            -- Caso o item não seja encontrado:
-            let logFail = LogEntry time Remove
-                    ("Falha ao remover: ID " ++ idItem ++ " não encontrado.")
-                    (Falha "Item inexistente")
-            in Left "Item inexistente"
+            -- ID não existe
+            let msg = "Item inexistente"
+                logFail = LogEntry time Remove msg (Falha msg)
+            in Left msg
 
         Just item ->
-            -- Caso encontrado: remove o item e gera log de sucesso.
-            let novoInv = Map.delete idItem inv
-                logOk = LogEntry time Remove
-                    ("Item " ++ nome item ++ " removido com sucesso.")
-                    Sucesso
-            in Right (novoInv, logOk)
+            let estoqueAtual = quantidade item in
+
+            if qtdRemover <= 0 then
+                let msg = "Quantidade inválida para remoção."
+                    logFail = LogEntry time Remove msg (Falha msg)
+                in Left msg
+
+            else if qtdRemover > estoqueAtual then
+                -- Tentou remover mais do que existe
+                let msg = "Estoque insuficiente."
+                    logFail = LogEntry time Remove msg (Falha msg)
+                in Left msg
+
+            else if qtdRemover == estoqueAtual then
+                -- Remove completamente o item
+                let novoInv = Map.delete idItem inv
+                    logOk = LogEntry time Remove
+                                ("Item " ++ nome item ++ " removido completamente.")
+                                Sucesso
+                in Right (novoInv, logOk)
+
+            else
+                -- Remoção parcial -> reduz quantidade
+                let novoItem = item { quantidade = estoqueAtual - qtdRemover }
+                    novoInv  = Map.insert idItem novoItem inv
+                    logOk = LogEntry time Remove
+                                ("Removidas " ++ show qtdRemover ++
+                                 " unidades de " ++ nome item ++ ".")
+                                Sucesso
+                in Right (novoInv, logOk)
             
             
             
@@ -222,7 +246,7 @@ carregarInventario = do
 
 
 
--- ----------- Função carregarLog (CORRIGIDA E DETALHADA) -----------
+-- ----------- Função carregarLog -----------
 -- Essa função garante que o arquivo de log sempre exista e esteja pronto para uso.
 -- Se estiver vazio ou corrompido, ele é recriado automaticamente.
 carregarLog :: IO ()
@@ -369,18 +393,26 @@ processarComando time ("add":idItem:nome:qtdStr:cat:_) inv =
 
 
 -- -------------------- REMOVE --------------------
-processarComando time ("remove":idItem:_) inv =
-    case removeItem time idItem inv of
-        Left msg -> do
+processarComando time ("remove":idItem:qtdStr:_) inv =
+    case reads qtdStr :: [(Int, String)] of
+        [(qtd, "")] -> do
+            case removeItem time idItem qtd inv of
+                Left msg -> do
+                    let logFail = LogEntry time Remove msg (Falha msg)
+                    salvarLog logFail
+                    putStrLn ("Erro: " ++ msg)
+                    return inv
+                Right (novoInv, logOk) -> do
+                    salvarInventario novoInv
+                    salvarLog logOk
+                    putStrLn "Remoção bem-sucedida!"
+                    return novoInv
+        _ -> do
+            let msg = "Quantidade inválida."
             let logFail = LogEntry time Remove msg (Falha msg)
             salvarLog logFail
-            putStrLn ("Erro: " ++ msg)
+            putStrLn msg
             return inv
-        Right (novoInv, logOk) -> do
-            salvarInventario novoInv
-            salvarLog logOk
-            putStrLn "Item removido com sucesso!"
-            return novoInv
 
 
 
@@ -415,6 +447,16 @@ processarComando _ ["report"] inv = do
     exibirRelatorio
     return inv
 
+
+
+-- -------------------- LIST --------------------
+processarComando _ ["list"] inv = do
+    if Map.null inv
+        then putStrLn "Inventário vazio."
+        else do
+            putStrLn "\n=== Itens no inventário ==="
+            mapM_ print (Map.elems inv)
+    return inv
 
 
 
@@ -463,7 +505,7 @@ main = do
     putStrLn " Atenção!! os nomes dos produtos NÃO podem conter espaço!"
     putStrLn "\nComandos disponíveis:"
     putStrLn " add <id> <nome> <qtd> <cat>"
-    putStrLn " remove <id>"
+    putStrLn " remove <id> <quantidade>"
     putStrLn " update <id> <qtd>"
     putStrLn " report"
     putStrLn " exit"
