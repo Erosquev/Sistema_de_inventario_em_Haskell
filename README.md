@@ -26,7 +26,7 @@ A ideia do projeto é desenvolver um sistema de gerenciamento de inventário em 
 
 ```
 /Projeto Sistema de inventario em Haskell
-├── 
+├── main.hs - Código Completo 
 └── README.md - Documentação do projeto
 ```
 
@@ -40,9 +40,10 @@ A ideia do projeto é desenvolver um sistema de gerenciamento de inventário em 
 4. Clique no botão **Run** para compilar e iniciar o programa.
 5. Assim que o console abrir, você verá o menu principal do sistema.
 
-## Exemplos de teste
+## 10 Exemplos de teste (Funcionalidade)
 
 1. Adicionar um item corretamente:
+
 **Comando**
 ```
 add P01 Teclado 10 Informatica
@@ -53,6 +54,7 @@ Item adicionado com sucesso!
 ```
 
 2. Tentar adicionar item com ID duplicado:
+
 **Comando**
 ```
 add P01 TecladoGamer 5 Informatica
@@ -63,6 +65,7 @@ Erro: ID duplicado
 ```
 
 3. Atualizar quantidade:
+
 **Comando**
 ```
 update P01 25
@@ -73,6 +76,7 @@ Quantidade atualizada!
 ```
 
 4. Remover parcialmente:
+
 **Comando**
 ```
 remove P01 5
@@ -82,7 +86,64 @@ remove P01 5
 Remoção bem-sucedida!
 ```
 
-5. Gerar relatório completo:
+5. Remover item inexistente:
+
+**Comando**
+```
+remove XYZ 5
+```
+**Resposta Esperada** 
+```
+Erro: Item inexistente
+```
+
+6. Atualizar quantidade para valor negativo:
+
+**Comando**
+```
+update P01 -10
+```
+**Resposta Esperada** 
+```
+Erro: Quantidade negativa
+```
+
+7. Remover mais do que o estoque:
+
+**Comando**
+```
+remove P01 9999
+```
+**Resposta Esperada** 
+```
+Erro: Estoque insuficiente.
+```
+
+8. Comando inválido:
+
+**Comando**
+```
+adicionar P01 10 Informatica
+```
+**Resposta Esperada** 
+```
+Comando inválido.
+```
+
+9. Listar inventário vazio:
+
+**Comando**
+```
+list
+```
+**Resposta Esperada** 
+```
+=== Itens no inventário ===
+Item {itemID = "P01", nome = "Teclado", quantidade = 20, categoria = "Informatica"}
+```
+
+10. Gerar relatório completo:
+
 **Comando**
 ```
 report
@@ -90,12 +151,16 @@ report
 **Resposta Esperada** 
 ```
 ================== RELATÓRIO ==================
-Total de registros de log: 4
+Total de registros de log: 8
 ----------------------------------------------
 Erros registrados:
 ID duplicado
+Item inexistente
+Quantidade negativa
+Estoque insuficiente.
+Comando inválido.
 ----------------------------------------------
-Item mais movimentado: Teclado (2 ocorrências)
+Item mais movimentado: Item (2 ocorrências)
 ==============================================
 ```
 
