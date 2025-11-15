@@ -44,7 +44,67 @@ A ideia do projeto é desenvolver um sistema de gerenciamento de inventário em 
 
 1. Iniciar o programa (sem arquivos de dados):
 
-2. Adicionar 3 itens: 
+2. Adicionar 10 itens (Dados Mínimos): 
+
+**Comando**
+```
+add P01 Teclado 10 Informatica
+add P02 Mouse 5 Informatica
+add P03 Monitor 3 Informatica
+add P04 Cadeira 20 Moveis
+add P05 Mesa 15 Moveis
+add P06 CaboHDMI 50 Cabos
+add P07 Headset 8 Audio
+add P08 Webcam 4 Video
+add P09 SSD 12 Armazenamento
+add P10 Roteador 6 Rede
+```
+**Resultado**
+```
+Item adicionado com sucesso!
+Item adicionado com sucesso!
+Item adicionado com sucesso!
+Item adicionado com sucesso!
+Item adicionado com sucesso!
+Item adicionado com sucesso!
+Item adicionado com sucesso!
+Item adicionado com sucesso!
+Item adicionado com sucesso!
+Item adicionado com sucesso!
+```
+3. Fechar o programa:
+
+**Comando**
+```
+exit
+```
+**Resultado**
+```
+Saindo...
+```
+
+4. Verificar se os arquivos foram criados (Comprovação de Persistência):
+
+**Comando**
+```
+list
+```
+**Resultado**
+```
+=== Itens no inventário ===
+Item {itemID = "P01", nome = "Teclado", quantidade = 10, categoria = "Informatica"}
+Item {itemID = "P02", nome = "Mouse", quantidade = 5, categoria = "Informatica"}
+Item {itemID = "P03", nome = "Monitor", quantidade = 3, categoria = "Informatica"}
+Item {itemID = "P04", nome = "Cadeira", quantidade = 20, categoria = "Moveis"}
+Item {itemID = "P05", nome = "Mesa", quantidade = 15, categoria = "Moveis"}
+Item {itemID = "P06", nome = "CaboHDMI", quantidade = 50, categoria = "Cabos"}
+Item {itemID = "P07", nome = "Headset", quantidade = 8, categoria = "Audio"}
+Item {itemID = "P08", nome = "Webcam", quantidade = 4, categoria = "Video"}
+Item {itemID = "P09", nome = "SSD", quantidade = 12, categoria = "Armazenamento"}
+Item {itemID = "P10", nome = "Roteador", quantidade = 6, categoria = "Rede"}
+```
+
+6. Adicionar 3 itens: 
 
 **Comando**
 ```
@@ -59,7 +119,7 @@ Item adicionado com sucesso!
 Item adicionado com sucesso!
 ```
 
-3. Fechar o programa:
+6. Fechar o programa:
 
 **Comando**
 ```
@@ -70,16 +130,16 @@ exit
 Saindo...
 ```
 
-4. Verificar se os arquivos foram criados:
+7. Verificar se os arquivos foram criados:
 
 ```
-Inventario.dat
-Auditoria.log
+(Aviso) Arquivo de log não encontrado. Criando novo...
+(Aviso) Inventário vazio ou inexistente. Criando novo inventário...
 ```
   
-5. Reiniciar o programa:
+8. Reiniciar o programa:
 
-6. Executar comando de listagem:
+9. Executar comando de listagem:
 
 **Comando**
 ```
