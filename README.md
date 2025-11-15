@@ -40,127 +40,119 @@ A ideia do projeto é desenvolver um sistema de gerenciamento de inventário em 
 4. Clique no botão **Run** para compilar e iniciar o programa.
 5. Assim que o console abrir, você verá o menu principal do sistema.
 
-## 10 Exemplos de teste (Funcionalidade)
+## Cenário 1: Persistência de Estado (Sucesso):
 
-1. Adicionar um item corretamente:
+1. Iniciar o programa (sem arquivos de dados):
+
+2. Adicionar 3 itens: 
 
 **Comando**
 ```
 add P01 Teclado 10 Informatica
+add P02 Mouse 5 Informatica
+add P03 Monitor 3 Informatica
 ```
-**Resposta Esperada** 
+**Resultado**
 ```
+Item adicionado com sucesso!
+Item adicionado com sucesso!
 Item adicionado com sucesso!
 ```
 
-2. Tentar adicionar item com ID duplicado:
+3. Fechar o programa:
 
 **Comando**
 ```
-add P01 TecladoGamer 5 Informatica
+exit
 ```
-**Resposta Esperada** 
+**Resultado**
 ```
-Erro: ID duplicado
-```
-
-3. Atualizar quantidade:
-
-**Comando**
-```
-update P01 25
-```
-**Resposta Esperada** 
-```
-Quantidade atualizada!
+Saindo...
 ```
 
-4. Remover parcialmente:
+4. Verificar se os arquivos foram criados:
 
-**Comando**
 ```
-remove P01 5
+Inventario.dat
+Auditoria.log
 ```
-**Resposta Esperada** 
-```
-Remoção bem-sucedida!
-```
+  
+5. Reiniciar o programa:
 
-5. Remover item inexistente:
-
-**Comando**
-```
-remove XYZ 5
-```
-**Resposta Esperada** 
-```
-Erro: Item inexistente
-```
-
-6. Atualizar quantidade para valor negativo:
-
-**Comando**
-```
-update P01 -10
-```
-**Resposta Esperada** 
-```
-Erro: Quantidade negativa
-```
-
-7. Remover mais do que o estoque:
-
-**Comando**
-```
-remove P01 9999
-```
-**Resposta Esperada** 
-```
-Erro: Estoque insuficiente.
-```
-
-8. Comando inválido:
-
-**Comando**
-```
-adicionar P01 10 Informatica
-```
-**Resposta Esperada** 
-```
-Comando inválido.
-```
-
-9. Listar inventário vazio:
+6. Executar comando de listagem:
 
 **Comando**
 ```
 list
 ```
-**Resposta Esperada** 
+**Resultado**
 ```
 === Itens no inventário ===
-Item {itemID = "P01", nome = "Teclado", quantidade = 20, categoria = "Informatica"}
+Item {itemID = "P01", nome = "Teclado", quantidade = 10, categoria = "Informatica"}
+Item {itemID = "P02", nome = "Mouse", quantidade = 5, categoria = "Informatica"}
+Item {itemID = "P03", nome = "Monitor", quantidade = 3, categoria = "Informatica"}
 ```
 
-10. Gerar relatório completo:
+## Cenário 2: Erro de Lógica (Estoque Insuficiente)
+
+1. Adicionar um item com 10 unidades:
+
+**Comando**
+```
+add T10 Teclado 10 Informatica
+```
+**Resultado**
+```
+Item adicionado com sucesso!
+```
+
+2. Tentar remover mais do que o estoque (15 unidades):
+   
+**Comando**
+```
+remove T10 15
+```
+**Resultado**
+```
+Erro: Estoque insuficiente.
+```
+
+3. Verificar inventário:
+
+**Comando**
+```
+list
+```
+**Resultado**
+```
+=== Itens no inventário ===
+Item {itemID = "T10", nome = "Teclado", quantidade = 10, categoria = "Informatica"}
+```
+
+4. Verificar se o log da operação foi gravado no Auditoria.log:
+
+```
+LogEntry {timestamp = 2025-11-15 01:07:57.146195553 UTC, acao = Add, detalhes = "Item Teclado adicionado com sucesso.", status = Sucesso}
+LogEntry {timestamp = 2025-11-15 01:08:25.816299546 UTC, acao = Remove, detalhes = "Estoque insuficiente.", status = Falha "Estoque insuficiente."}
+```
+
+## Cenário 3: Geração de Relatório de Erros
+
+1.Executar o comando de relatório:
 
 **Comando**
 ```
 report
 ```
-**Resposta Esperada** 
+**Resultado**
 ```
 ================== RELATÓRIO ==================
-Total de registros de log: 8
+Total de registros de log: 2
 ----------------------------------------------
 Erros registrados:
-ID duplicado
-Item inexistente
-Quantidade negativa
 Estoque insuficiente.
-Comando inválido.
 ----------------------------------------------
-Item mais movimentado: Item (2 ocorrências)
+Item mais movimentado: Estoque (1 ocorrências)
 ==============================================
 ```
 
